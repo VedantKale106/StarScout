@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StarScout</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+
+<style>
+    body {
+        background: #000;
+    }
+
+    #load {
+        position: absolute;
+        width: 600px;
+        height: 36px;
+        left: 50%;
+        top: 40%;
+        margin-left: -300px;
+        overflow: visible;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: default;
+    }
+
+    #load div {
+        position: absolute;
+        width: 20px;
+        height: 36px;
+        opacity: 0;
+        font-family: Helvetica, Arial, sans-serif;
+        animation: move 2s linear infinite;
+        transform: rotate(180deg);
+        color: #35C4F0;
+    }
+
+    #load div:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    #load div:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    #load div:nth-child(4) {
+        animation-delay: 0.6s;
+    }
+
+    #load div:nth-child(5) {
+        animation-delay: 0.8s;
+    }
+
+    #load div:nth-child(6) {
+        animation-delay: 1s;
+    }
+
+    #load div:nth-child(7) {
+        animation-delay: 1.2s;
+    }
+
+    @keyframes move {
+        0% {
+            left: 0;
+            opacity: 0;
+        }
+
+        35% {
+            left: 41%;
+            transform: rotate(0deg);
+            opacity: 1;
+        }
+
+        65% {
+            left: 59%;
+            transform: rotate(0deg);
+            opacity: 1;
+        }
+
+        100% {
+            left: 100%;
+            transform: rotate(-180deg);
+            opacity: 0;
+        }
+    }
+
+
+    #form-container {
+        display: none;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: transform 0.6s ease, opacity 0.6s ease;
+    }
+
+    #form-container.fade-in {
+        display: block;
+        opacity: 1;
+        transform: scale(1);
+    }
+</style>
+
+
+<style>
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.card:hover {
+    transform: scale(1.05) ;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.card img {
+    transition: transform 0.3s ease;
+}
+
+.card:hover img {
+    transform: scale(1.1);
+}
+
+.card-title, .card-text {
+    transition: text-shadow 0.3s ease;
+}
+
+.card:hover .card-title, .card:hover .card-text {
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+    </style>
+
+<body>
+
+    <audio id="background-sound" src="static\sound.mp3" preload="auto"></audio>
+
+    <div id="load">
+        <div>G</div>
+        <div>N</div>
+        <div>I</div>
+        <div>D</div>
+        <div>A</div>
+        <div>O</div>
+        <div>L</div>
+    </div>
+
+    <div class="container mt-5" id="form-container">
+        <header>
+            <h1 class="text-center text-light" onclick="playAudio()">Welcome to StarScout</h1>
+        </header>
+        <h2 class="text-center text-light mt-4">Enter the features you desire</h2>
+
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="age" class="text-light">Age:</label>
+                        <input type="number" class="form-control" id="age" name="age"
+                            value="{{ request.form.age or '' }}" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="hair_color" class="text-light">Hair Color:</label>
+                        <select class="form-control" id="hair_color" name="hair_color" required>
+                            {% for hair_color in unique_values['Hair Color:'] %}
+                            <option value="{{ hair_color }}" {% if request.form.hair_color==hair_color %}selected{%
+                                endif %}>{{ hair_color }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="fake_boobs" class="text-light">Fake Boobs:</label>
+                        <select class="form-control" id="fake_boobs" name="fake_boobs" required>
+                            {% for fake_boobs in unique_values['Fake Boobs:'] %}
+                            <option value="{{ fake_boobs }}" {% if request.form.fake_boobs==fake_boobs %}selected{%
+                                endif %}>{{ fake_boobs }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="piercings" class="text-light">Piercings:</label>
+                        <select class="form-control" id="piercings" name="piercings" required>
+                            {% for piercings in unique_values['Piercings:'] %}
+                            <option value="{{ piercings }}" {% if request.form.piercings==piercings %}selected{% endif
+                                %}>{{ piercings }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="background" class="text-light">Background:</label>
+                        <select class="form-control" id="background" name="background" required>
+                            {% for background in unique_values['Background:'] %}
+                            <option value="{{ background }}" {% if request.form.background==background %}selected{%
+                                endif %}>{{ background }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="height" class="text-light">Height (in cm):</label>
+                        <input type="number" class="form-control" id="height" name="height"
+                            value="{{ request.form.height or '' }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="weight" class="text-light">Weight (in kg):</label>
+                        <input type="number" class="form-control" id="weight" name="weight"
+                            value="{{ request.form.weight or '' }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary" onclick="playAudio()">Get Recommendation</button>
+
+            </div>
+        </form>
+
+
+        {% if recommended_star %}
+<div class="mt-4 text-center">
+    <div class="card bg-dark text-light" style="border: 2px solid #35C4F0; border-radius: 10px;">
+        <div class="card-body">
+            <h3>Recommended Pornstar:</h3>
+            <h1 class="text-light">{{ recommended_star }}</h1>
+        </div>
+    </div>
+</div>
+
+{% if recommended_link %}
+<div class="mt-4 text-center">
+    <div class="card bg-dark text-light" style="border: 2px solid #35C4F0; border-radius: 10px;">
+        <div class="card-body">
+            <a href="{{ recommended_link }}" target="_blank" style="font-size: 40px; padding: 10px 20px; text-decoration: none; color: #35C4F0;">Watch Now 🥵</a>
+            <h6 style="color: red;">Note: Use VPN</h6>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<h1 style="text-align: center; color: #7070fc; margin-top: 30px;">Pornstar Details</h1>
+<div style="max-width: 100%; margin: 0 auto; padding: 20px; border: 1px solid #e67e22; border-radius: 10px; background-color: #f9f9f9; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+        {% if recommended_details %}
+            {% for key, value in recommended_details.items() %}
+                <div style="margin: 10px 0; font-size: 18px; padding: 10px; border: 1px solid #2980b9; border-radius: 5px; background-color: #ffffff; transition: transform 0.3s, box-shadow 0.3s;" 
+                     onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 12px rgba(0, 0, 0, 0.2)';" 
+                     onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';">
+                    <strong style="color: #2980b9;">{{ key }}:</strong> {{ value }}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="grid-column: span 2; margin: 10px 0; font-size: 18px; color: #e74c3c;">
+                No details found for the selected pornstar.
+            </div>
+        {% endif %}
+    </div>
+    <p style="text-align: center; font-size: 14px; color: #7f8c8d; margin-top: 20px;">
+        Note: The data is taken from Pornhub.
+    </p>
+</div>
+
+
+    {% endif %}
+
+
+
+
+        <div class="container mt-5">
+            <h1 class="text-center text-light">Why Users Love StarScout ❤️</h1>
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card bg-dark text-light">
+                        <div class="card-body">
+                            <h5 class="card-title">Pelvish Yadav</h5>
+                            <p class="card-text">"Bhaisahab ! System Hang Kar diya website ne 🥵. Majje aa gaya!"</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-dark text-light">
+                        <div class="card-body">
+                            <h5 class="card-title">Deepak Kalal</h5>
+                            <p class="card-text">"Mera to pani nikal gaya 💦. Mujhe kissi dedo!"</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-dark text-light">
+                        <div class="card-body">
+                            <h5 class="card-title">Lord Rohan</h5>
+                            <p class="card-text">"Very very useful 🙏 and saves a lot of time for me!"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-5">
+            <h1 class="text-center text-light">Featured Stars 🫦</h1>
+            <div class="row mt-4">
+                <style>
+                    .card-img-top {
+                        width: 100%;
+                        height: 400px; 
+                        object-fit: cover;
+                    }
+                </style>
+                
+                <div class="col-md-4">
+                    <a href="https://en.wikipedia.org/wiki/Mia_Khalifa" target="_blank">
+                        <div class="card bg-dark text-light">
+                            <img class="card-img-top" src="static/mia.jpg" alt="Mia">
+                            <div class="card-body">
+                                <h5 class="card-title">Mia Khalifa</h5>
+                                <p class="card-text">"StarScout helped me connect with fans in a new and exciting way! It's a game-changer!"</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="col-md-4">
+                    <a href="https://en.wikipedia.org/wiki/Sunny_Leone" target="_blank">
+                        <div class="card bg-dark text-light">
+                            <img class="card-img-top" src="static/sunny.jpeg" alt="Sunny">
+                            <div class="card-body">
+                                <h5 class="card-title">Sunny Leone</h5>
+                                <p class="card-text">"I love how easy it is to navigate StarScout. It truly caters to every fan's desires!"</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="col-md-4">
+                    <a href="https://en.wikipedia.org/wiki/Lana_Rhoades" target="_blank">
+                        <div class="card bg-dark text-light">
+                            <img class="card-img-top" src="static/lana.jpg" alt="Lana">
+                            <div class="card-body">
+                                <h5 class="card-title">Lana Rhoades</h5>
+                                <p class="card-text">"The accuracy of the recommendations is spot on! I was impressed by how personalized everything felt."</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="container mt-5">
+                    <h1 class="text-center text-light">Featured Articles 📰</h1>
+                    <div class="row mt-4">
+                        <div class="col-md-4 d-flex">
+                            <div class="card bg-dark text-light flex-fill">
+                                <div class="card-body">
+                                    <h5 class="card-title">The Evolution of Adult Entertainment</h5>
+                                    <p class="card-text">Explore how technology has shaped the adult entertainment industry.</p>
+                                    <a href="#" class="btn btn-primary">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex">
+                            <div class="card bg-dark text-light flex-fill">
+                                <div class="card-body">
+                                    <h5 class="card-title">Top 10 Stars of the Year</h5>
+                                    <p class="card-text">A look at the most popular stars in the industry.</p>
+                                    <a href="#" class="btn btn-primary">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex">
+                            <div class="card bg-dark text-light flex-fill">
+                                <div class="card-body">
+                                    <h5 class="card-title">Safety Tips for Fans</h5>
+                                    <p class="card-text">Important tips to ensure a safe experience while exploring adult content.</p>
+                                    <a href="#" class="btn btn-primary">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+                    </div>
+                </div>
+                <!-- Footer Section -->
+                <footer class="bg-dark text-light mt-5 p-4">
+                    <div class="container">
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <h1>Why Choose StarScout?</h1>
+                                <ul class="list-unstyled">
+                                    <li class="h5 mb-4 mt-4">Personalized Recommendations</li>
+                                    <li class="h5 mb-4">User-Friendly Interface</li>
+                                    <li class="h5 mb-4">Wide Range of Options</li>
+                                    <li class="h5 mb-4">Community Support</li>
+                                    <li class="h5 mb-4">Regular Updates and Improvements</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5>Frequently Asked Questions</h5>
+                                <div class="accordion" id="faqAccordionFooter">
+                                    <div class="card bg-dark text-light">
+                                        <div class="card-header" id="footerHeadingOne">
+                                            <h5 class="mb-0">
+                                                <button class="btn btn-link text-light" type="button" data-toggle="collapse" data-target="#footerCollapseOne" aria-expanded="true" aria-controls="footerCollapseOne">
+                                                    What is StarScout?
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="footerCollapseOne" class="collapse" aria-labelledby="footerHeadingOne" data-parent="#faqAccordionFooter">
+                                            <div class="card-body">
+                                                StarScout is a platform that helps you find personalized recommendations based on your preferences.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card bg-dark text-light">
+                                        <div class="card-header" id="footerHeadingTwo">
+                                            <h5 class="mb-0">
+                                                <button class="btn btn-link text-light" type="button" data-toggle="collapse" data-target="#footerCollapseTwo" aria-expanded="false" aria-controls="footerCollapseTwo">
+                                                    How does the recommendation system work?
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="footerCollapseTwo" class="collapse" aria-labelledby="footerHeadingTwo" data-parent="#faqAccordionFooter">
+                                            <div class="card-body">
+                                                Our algorithm analyzes your input features and matches them with a database of stars to provide the best recommendations.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card bg-dark text-light">
+                                        <div class="card-header" id="footerHeadingThree">
+                                            <h5 class="mb-0">
+                                                <button class="btn btn-link text-light" type="button" data-toggle="collapse" data-target="#footerCollapseThree" aria-expanded="false" aria-controls="footerCollapseThree">
+                                                    Is my data safe with StarScout?
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="footerCollapseThree" class="collapse" aria-labelledby="footerHeadingThree" data-parent="#faqAccordionFooter">
+                                            <div class="card-body">
+                                                Yes, we prioritize your privacy and security, ensuring your data is protected and used only for recommendations.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card bg-dark text-light">
+                                        <div class="card-header" id="footerHeadingFour">
+                                            <h5 class="mb-0">
+                                                <button class="btn btn-link text-light" type="button" data-toggle="collapse" data-target="#footerCollapseFour" aria-expanded="false" aria-controls="footerCollapseFour">
+                                                    Can I provide feedback on recommendations?
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="footerCollapseFour" class="collapse" aria-labelledby="footerHeadingFour" data-parent="#faqAccordionFooter">
+                                            <div class="card-body">
+                                                Absolutely! We welcome user feedback to improve our recommendations and overall experience.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card bg-dark text-light">
+                                        <div class="card-header" id="footerHeadingFive">
+                                            <h5 class="mb-0">
+                                                <button class="btn btn-link text-light" type="button" data-toggle="collapse" data-target="#footerCollapseFive" aria-expanded="false" aria-controls="footerCollapseFive">
+                                                    How can I contact customer support?
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="footerCollapseFive" class="collapse" aria-labelledby="footerHeadingFive" data-parent="#faqAccordionFooter">
+                                            <div class="card-body">
+                                                Nikal Lavde!
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center p-3 mt-4" onclick="playAudio()">
+                        &copy; 2024 StarScout. All rights reserved.
+                    </div>
+                </footer>
+                
+                <!-- Include jQuery and Bootstrap JS -->
+                <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+                <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+                
+
+            </div>
+        </div>
+
+        
+
+    </div>
+
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const cardWrappers = document.querySelectorAll('.card-wrapper');
+        
+            function checkScroll() {
+                const triggerBottom = window.innerHeight / 5 * 4; // Change to control when to show cards
+        
+                cardWrappers.forEach(card => {
+                    const cardTop = card.getBoundingClientRect().top;
+        
+                    if (cardTop < triggerBottom) {
+                        card.classList.add('visible');
+                    }
+                });
+            }
+        
+            window.addEventListener('scroll', checkScroll);
+            checkScroll(); // Check on page load
+        });
+        </script>
+        
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+        $('#load').fadeOut('slow', function () {
+            $('#form-container').css('display', 'block');
+            setTimeout(function () {
+                $('#form-container').addClass('fade-in');
+                // Play the sound
+                document.getElementById('background-sound').play();
+            }, 100);
+        });
+    }, 3000);
+});
+
+    </script>
+
+<script>
+    function playAudio() {
+        const audio = document.getElementById('background-sound');
+        audio.play().catch((error) => {
+            console.error('Error playing audio:', error);
+        });
+    }
+</script>
+
+
+
+
+</body>
+
+</html>
